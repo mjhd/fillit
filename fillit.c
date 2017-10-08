@@ -27,19 +27,61 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+// CAN'T KEEP!!
+#include <string.h>
+//#include "libft.h"
 
-void	validate()
+int	validate(fp)
 {
+	int		checksum;
+	char	value;
 
+	// NO MORE THAN 26
+
+	checksum = 0;
+	value = 31;
+	while (read(fp, &value, 1))
+	{
+		checksum += value;
+		if (((checksum == 786) || (checksum == 742)) && checksum < 787)
+			checksum = 0;
+		else if(checksum >= 787)
+		{
+			//printf("invalid\n");
+			return(-1);
+		}
+		//printf("%d\n", checksum);
+	}
+	checksum += ((int)value == 10) ? 10 : 0;
+	checksum = (checksum == 786 || checksum == 742) ? 0 : -1;
+	//printf("%s\n", (!checksum) ? "valid" : "invalid");
+	return (checksum);
 }
-fillit(grid, tet_fp)
+
+char *fillit(char *map, int fp)
+{
+	if (map == -1)
+	{
+		map = (char *)malloc(6);
+		strcpy(map, "error");
+	}
+	else if (!map)
+	{
+		map = (char *)malloc(2);
+		map[0] = '!';
+		map[1] = '\0';
+		//make new map
+	}
 /*
-	fillit() is called taking 0 for first itertion and recursivly passing itself grid (solution grid variable)
-	add new tet to fresh grid of previous size grid (but empty)
-	shuffle new tet to optimal top left position
-	reconsider all previos tets on grid var and shuffle them into empty grid with new tet already positioned
-	if more tets -> call fillit and pass new grid var
-*/
+		disassemble map into links to each peice;
+		base letter assignment of new tet on number of tets dissambled;
+		convert peice to letters and make fresh map from previous map size;
+		place converted new tet on fresh map;
+		reassemble linked tets from previous map -> growing map if necessary;
+	*/
+	//fillit(map, fp);
+	return map;
+}
 
 
 int	main(int argc, char **argv)
@@ -52,26 +94,9 @@ int	main(int argc, char **argv)
 
 
 	int		fp;
-	int		checksum;
-	char	value;
+	char	*result;
 
-	value = 31;
-	checksum = 0;
 	fp = open(argv[1], O_RDONLY);
-	while (read(fp, &value, 1))
-	{
-		checksum += value;
-		if (((checksum == 786) || (checksum == 742)) && checksum < 787)
-			checksum = 0;
-		else if(checksum >= 787)
-		{
-			printf("invalid\n");
-			return(-1);
-		}
-		//printf("%d\n", checksum);
-	}
-	checksum += ((int)value == 10) ? 10 : 0;
-	printf("%s\n", (checksum == 786 || checksum == 742) ? "valid" : "invalid");
-
+	printf("%s\n", fillit((char *)validate(fp), fp));
 	return(0);
 }
