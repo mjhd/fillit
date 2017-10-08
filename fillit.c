@@ -27,6 +27,21 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+
+void	validate()
+{
+
+}
+fillit(grid, tet_fp)
+/*
+	fillit() is called taking 0 for first itertion and recursivly passing itself grid (solution grid variable)
+	add new tet to fresh grid of previous size grid (but empty)
+	shuffle new tet to optimal top left position
+	reconsider all previos tets on grid var and shuffle them into empty grid with new tet already positioned
+	if more tets -> call fillit and pass new grid var
+*/
+
+
 int	main(int argc, char **argv)
 {
 	if (argc != 2)
@@ -41,16 +56,22 @@ int	main(int argc, char **argv)
 	char	value;
 
 	value = 31;
+	checksum = 0;
 	fp = open(argv[1], O_RDONLY);
 	while (read(fp, &value, 1))
 	{
 		checksum += value;
-		if (checksum % n == x && checksum < max)
+		if (((checksum == 786) || (checksum == 742)) && checksum < 787)
 			checksum = 0;
-		else
+		else if(checksum >= 787)
+		{
+			printf("invalid\n");
 			return(-1);
+		}
+		//printf("%d\n", checksum);
 	}
-
+	checksum += ((int)value == 10) ? 10 : 0;
+	printf("%s\n", (checksum == 786 || checksum == 742) ? "valid" : "invalid");
 
 	return(0);
 }
