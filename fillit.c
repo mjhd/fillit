@@ -29,52 +29,74 @@
 
 // CAN'T KEEP!!
 #include <string.h>
+#include <stdlib.h>
 //#include "libft.h"
 
-int	validate(fp)
+int	*validate(fp)
 {
-	int		checksum;
+	int		*checksum;
 	char	value;
 
 	// NO MORE THAN 26
 
-	checksum = 0;
+	checksum = (int *)malloc(sizeof(int));
+	*checksum = 0;
 	value = 31;
 	while (read(fp, &value, 1))
 	{
-		checksum += value;
-		if (((checksum == 786) || (checksum == 742)) && checksum < 787)
-			checksum = 0;
-		else if(checksum >= 787)
+		*checksum += value;
+		if (((*checksum == 786) || (*checksum == 742)) && *checksum < 787)
+			*checksum = 0;
+		else if(*checksum >= 787)
 		{
 			//printf("invalid\n");
-			return(-1);
+			*checksum = -1;
+			return(checksum);
 		}
 		//printf("%d\n", checksum);
 	}
-	checksum += ((int)value == 10) ? 10 : 0;
-	checksum = (checksum == 786 || checksum == 742) ? 0 : -1;
+	*checksum += ((int)value == 10) ? 10 : 0;
+	*checksum = (*checksum == 786 || *checksum == 742) ? 0 : -1;
 	//printf("%s\n", (!checksum) ? "valid" : "invalid");
 	return (checksum);
 }
 
 char *fillit(char *map, int fp)
 {
-	if (map == -1)
+	char	buf;
+	char	*pnt;
+	int		i;
+
+	i = 20;
+	if ((int)(*map) == -1)
 	{
 		map = (char *)malloc(6);
 		strcpy(map, "error");
 	}
-	else if (!map)
+	else if (!(int)(*map))
 	{
-		map = (char *)malloc(2);
-		map[0] = '!';
-		map[1] = '\0';
-		//make new map
+		map = (char *)malloc(21);
+		pnt = map;
+		while (i-- && read(fp, &buf, 1))
+			(*pnt++) = buf;
+		*pnt = '$';
+
+		map = ft_blanklineslicer(map);
 	}
+
+
+
 /*
 		disassemble map into links to each peice;
 		base letter assignment of new tet on number of tets dissambled;
+		ft_compare all possible combinations of stored tets with new tet
+		int ft_compare(tet1, tet2, map); -> return 0 or 1
+		ft_compare(tet_compare_of, tet_compare_to, map);
+		array[# of dissasembled tets + 1] -> 0
+		array[member + ft_compare] for ft compare hits
+
+
+
 		convert peice to letters and make fresh map from previous map size;
 		place converted new tet on fresh map;
 		reassemble linked tets from previous map -> growing map if necessary;
@@ -82,6 +104,7 @@ char *fillit(char *map, int fp)
 	//fillit(map, fp);
 	return map;
 }
+
 
 
 int	main(int argc, char **argv)
@@ -93,10 +116,15 @@ int	main(int argc, char **argv)
 
 
 
-	int		fp;
+	int		fpv;
+	int		fpf;
 	char	*result;
+	//char 	*file = "....\n...#\n..##\n..#.\n....\n....\n#...\n###.\n";
 
-	fp = open(argv[1], O_RDONLY);
-	printf("%s\n", fillit((char *)validate(fp), fp));
+	fpv = open(argv[1], O_RDONLY);
+	fpf = open(argv[1], O_RDONLY);
+	int dummy = 0;
+	//printf("%s\n", fillit((char *)validate(fp), fp));
+	printf("%s\n", fillit((char *)validate(fpv), fpf));
 	return(0);
 }
