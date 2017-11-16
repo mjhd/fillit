@@ -32,36 +32,93 @@
 #include <stdlib.h>
 //#include "libft.h"
 
-int	*validate(fp)
+typedef struct tet {
+	struct tet *next;
+	int value[4][2];
+} tet;
+
+void  prnt_list(tet *list)
 {
-	int		*checksum;
+	tet *pnt;
+
+	pnt = list;
+	while ((*pnt).next)
+	{
+		printf("!");
+		pnt = (*pnt).next;
+	}
+	printf("!");
+}
+
+int	validate(int fp)
+{
+	int		checksum;
 	char	value;
+	int		x;
+	int 	y;
+	int 	valids;
 
 	// NO MORE THAN 26
 
-	checksum = (int *)malloc(sizeof(int));
-	*checksum = 0;
-	value = 31;
+	checksum = 0;
+	x = 4;
+	y = 4;
+	valids = 0;
+	struct tet *list;
+	struct tet *rdpnt;
+
+	list = (tet *)malloc(sizeof(struct tet));
+	rdpnt = list;
+
 	while (read(fp, &value, 1))
 	{
-		*checksum += value;
-		if (((*checksum == 786) || (*checksum == 742)) && *checksum < 787)
-			*checksum = 0;
-		else if(*checksum >= 787)
+		if(!checksum && !(*rdpnt).next)
 		{
-			//printf("invalid\n");
-			*checksum = -1;
-			return(checksum);
+			(*rdpnt).next = (tet *)malloc(sizeof(tet));
+			rdpnt = (*rdpnt).next;
 		}
-		//printf("%d\n", checksum);
+
+		value = *input++;
+		checksum += value;
+		if (value == '#')
+		{
+			//(*rdpnt).value[valids][0] = x;
+			//(*rdpnt).value[valids][1] = y;
+			printf("Found # at %d, %d\n", x, y);
+			valids++;
+		}
+		else if (value == '\n' && x && y != 4)
+		{
+			checksum = -1;
+			break;
+		}
+		else if (value != '\n' && value != '#' && value != '.')
+		{
+			value = -1;
+			break;
+		}
+		if (checksum == 732 && valids == 4)
+		{
+			checksum = 0;
+			valids = 0;
+			(*rdpnt).next = 0;
+		}
+		else if(checksum >= 733)
+		{
+			checksum = -1;
+			break;
+		}
+		//printf("%d , %d\n", x, y);
+		y = (value == '\n' && x == 0) ? y - 1 : y;
+		x = (value == '\n') ? 4 : x - 1;
+		y = (y == 0) ? 4 : y;
 	}
-	*checksum += ((int)value == 10) ? 10 : 0;
-	*checksum = (*checksum == 786 || *checksum == 742) ? 0 : -1;
-	//printf("%s\n", (!checksum) ? "valid" : "invalid");
+	checksum = (!checksum) ? 1 : 0;
+
 	return (checksum);
 }
 
-char *fillit(char *map, int fp)
+/*char *fillit(char *map, int fp)
 {
 	char	buf;
 	char	*pnt;
@@ -86,7 +143,7 @@ char *fillit(char *map, int fp)
 
 
 
-/*
+
 		disassemble map into links to each peice;
 		base letter assignment of new tet on number of tets dissambled;
 		ft_compare all possible combinations of stored tets with new tet
@@ -100,10 +157,10 @@ char *fillit(char *map, int fp)
 		convert peice to letters and make fresh map from previous map size;
 		place converted new tet on fresh map;
 		reassemble linked tets from previous map -> growing map if necessary;
-	*/
+
 	//fillit(map, fp);
 	return map;
-}
+}*/
 
 
 
@@ -113,18 +170,33 @@ int	main(int argc, char **argv)
 		return (-1);
 
 
+	//char *str = "....\n....\n....\n####\n\n....\n....\n###.\n..#.";
 
 
 
-	int		fpv;
-	int		fpf;
-	char	*result;
-	//char 	*file = "....\n...#\n..##\n..#.\n....\n....\n#...\n###.\n";
+	//int arr[4][2] = {{4,2}, {3,2}, {2,2}, {2,1}};
 
-	fpv = open(argv[1], O_RDONLY);
-	fpf = open(argv[1], O_RDONLY);
-	int dummy = 0;
-	//printf("%s\n", fillit((char *)validate(fp), fp));
-	printf("%s\n", fillit((char *)validate(fpv), fpf));
+	//char *str = "....\n....\n....\n####\n\n....\n....\n###.\n..#.\n";
+	//char *str = "\n....\n....\n....\n####\n\n....\n....\n###.\n..#.";
+	//char *str = "....\n....\n....\n####\n\n....\n....###.\n..#.\n";
+	//char *str = "\n....\n....\n....\n####\n\n....\n....###.\n..#.";
+
+
+	int		fp;
+
+	fp = open(argv[1], O_RDONLY);
+
+	struct tet *list;
+	list = (tet *)malloc(sizeof(struct tet));
+	(*list).next = list;
+
+	printf("%d\n", validate(fp, list));
+
+	prnt_list(list);
+
+	// if(validator(fp, **link)) {
+	//  file and tets validated and list attached to argument link
+	//  assembler(**link);
+	//}
 	return(0);
 }
